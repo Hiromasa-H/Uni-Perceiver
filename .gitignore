@@ -150,3 +150,5 @@ asset/*.pkl
 asset/*.pth
 
 weights/*
+
+data/*
