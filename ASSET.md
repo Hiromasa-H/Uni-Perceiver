@@ -12,10 +12,38 @@ sh run.sh configs/BERT_L12_H768_experiments/finetuning/in1k_training.yaml in1k-f
 ```
 -->
 ```
-python3 -m main.py --num-gpus 1 --config-file /home/hhiromasa/code/Uni-Perceiver/configs/BERT_L12_H768_experiments/finetuning/GLUE_finetuning_experiments/GLUE_QQP_mlm_finetune.yaml  OUTPUT_DIR /home/hhiromasa/code/Uni-Perceiver/asset/FT_glue MODEL.WEIGHTS /home/hhiromasa/code/Uni-Perceiver/weights/uni-perceiver-base-L12-H768-224size-torch-pretrained.pth
+python3 main.py --num-gpus 1 --config-file /home/hhiromasa/code/Uni-Perceiver/configs/BERT_L12_H768_experiments/finetuning/GLUE_finetuning_experiments/GLUE_QQP_mlm_finetune.yaml  OUTPUT_DIR /home/hhiromasa/code/Uni-Perceiver/asset/FT_glue MODEL.WEIGHTS /home/hhiromasa/code/Uni-Perceiver/weights/uni-perceiver-base-L12-H768-224size-torch-pretrained.pth
 ```
 
+path: 
+/home/hhiromasa/code/Uni-Perceiver/asset/FT_glue_fin/model_Epoch_10000_Iter_0009999.pth
+
 ## ImageNet1K Fine-Tuning
+```
+python3 main.py --num-gpus 1 --config-file /home/hhiromasa/code/Uni-Perceiver/configs/BERT_L12_H768_experiments/finetuning/in1k_training.yaml  OUTPUT_DIR /home/hhiromasa/code/Uni-Perceiver/asset/FT_in1k MODEL.WEIGHTS /home/hhiromasa/code/Uni-Perceiver/weights/uni-perceiver-base-L12-H768-224size-torch-pretrained.pth
+```
+
+path:
+/home/hhiromasa/code/Uni-Perceiver/asset/FT_in1k_fin/model_Epoch_01000_Iter_0000999.pth
+
+## saving model weights as pickle
+```
+python3 model_to_pickle.py --num-gpus 1 --config-file /home/hhiromasa/code/Uni-Perceiver/configs/BERT_L12_H768_experiments/finetuning/in1k_training.yaml  OUTPUT_DIR /home/hhiromasa/code/Uni-Perceiver/asset/FT_in1k MODEL.WEIGHTS [weights to save]
+```
+
+## merging models
+python3 model_merger.py
+
+## infernce on in1k
+```
+python3 main.py --num-gpus 1 --config-file /home/hhiromasa/code/Uni-Perceiver/configs/BERT_L12_H768_experiments/zeroshot_config/in1k_training.yaml --eval-only OUTPUT_DIR /home/hhiromasa/code/Uni-Perceiver/asset/MM_in1k MODEL.WEIGHTS /home/hhiromasa/code/Uni-Perceiver/asset/FT_glue_fin/model_Epoch_10000_Iter_0009999.pth
+
+/home/hhiromasa/code/Uni-Perceiver/asset/merged_model.pth 
+```
+## infernce on QQP
+```
+python3 main.py --num-gpus 1 --config-file /home/hhiromasa/code/Uni-Perceiver/configs/BERT_L12_H768_experiments/finetuning/GLUE_finetuning_experiments/GLUE_QQP_mlm_finetune.yaml --eval-only OUTPUT_DIR /home/hhiromasa/code/Uni-Perceiver/asset/MM MODEL.WEIGHTS /home/hhiromasa/code/Uni-Perceiver/asset/merged_model.pth 
+```
 
 
 ### pip
@@ -43,3 +71,5 @@ conda install anaconda::scikit-learn
 conda install anaconda::scipy
 conda install conda-forge::tensorboard
 ```
+
+python3 main.py --num-gpus 1 --config-file /home/hhiromasa/code/Uni-Perceiver/configs/BERT_L12_H768_experiments/zeroshot_config/in1k_training.yaml --eval-only OUTPUT_DIR /home/hhiromasa/code/Uni-Perceiver/asset/MM_in1k MODEL.WEIGHTS /home/hhiromasa/code/Uni-Perceiver/asset/FT_in1k_fin/model_Epoch_01000_Iter_0000999.pth
