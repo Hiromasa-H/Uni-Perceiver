@@ -143,3 +143,10 @@ slurm_run.sh
 
 core*
 dist_url_*
+
+asset/FT*
+asset/MM*
+asset/*.pkl
+asset/*.pth
+
+weights/*
