@@ -89,11 +89,13 @@ class TrainingSampler(Sampler):
         if num_replicas is None:
             if not dist.is_available():
                 raise RuntimeError("Requires distributed package to be available")
-            num_replicas = dist.get_world_size()
+            # num_replicas = dist.get_world_size()
+            num_replicas = 1#CHANGED
         if rank is None:
             if not dist.is_available():
                 raise RuntimeError("Requires distributed package to be available")
-            rank = dist.get_rank()
+            # rank = dist.get_rank()
+            rank = 0#CHANGED
         self.dataset = dataset
         self.num_replicas = num_replicas
         self.rank = rank

@@ -15,6 +15,8 @@ from collections import defaultdict, deque
 import torch.distributed as dist
 
 
+comm.temp_dir = '/home/hhiromasa/code/Uni-Perceiver/data'#CHANGED
+
 class SmoothedValue(object):
     """Track a series of values and provide access to smoothed values over a
     window or the global series average.
@@ -106,17 +108,17 @@ def test_cls(cfg, model, test_data_loader, evaluator, epoch, amp_fp16, task=None
     model.eval()
     results = []
 
-    if not os.path.exists(comm.temp_dir):
-        os.mkdir(comm.temp_dir)
+    # if not os.path.exists(comm.temp_dir):
+    #     os.mkdir(comm.temp_dir)
 
-    # shared_seed = comm.shared_random_seed() this simply does not work!
-    shared_seed = random.randint(0, sys.maxsize)
-    shared_seed = torch.tensor(shared_seed, device=next(model.parameters()).device)
-    torch.distributed.broadcast(shared_seed, src=0)
-    shared_seed = shared_seed.item()
-    if comm.is_main_process():
-        os.makedirs(os.path.join(comm.temp_dir, str(shared_seed)))
-    comm.synchronize()
+    # # shared_seed = comm.shared_random_seed() this simply does not work!
+    # shared_seed = random.randint(0, sys.maxsize)
+    # shared_seed = torch.tensor(shared_seed, device=next(model.parameters()).device)
+    # torch.distributed.broadcast(shared_seed, src=0)
+    # shared_seed = shared_seed.item()
+    # if comm.is_main_process():
+    #     os.makedirs(os.path.join(comm.temp_dir, str(shared_seed)))
+    # comm.synchronize()
 
     # remove the cached  embedding for word vocab
     if isinstance(getattr(comm.unwrap_model(model), 'beam_searcher', None), torch.nn.Module):
@@ -222,29 +224,29 @@ def test_cls(cfg, model, test_data_loader, evaluator, epoch, amp_fp16, task=None
             meter.synchronize_between_processes()
         eval_res = {'Acc@1': meters['acc1'].global_avg}
     else:
-        with open(os.path.join(comm.temp_dir, str(shared_seed), "rank_{}.pkl".format(comm.get_rank())), 'wb') as f:
-            # json.dump(results, f)
-            pickle.dump(results, f)
-        comm.synchronize()
-        if comm.is_main_process():
-            results_all = list()
-            for i in range(comm.get_world_size()):
-                with open(os.path.join(comm.temp_dir, str(shared_seed), "rank_{}.pkl".format(i)), 'rb') as f:
-                    # results_all += json.load(f)
-                    results_all += pickle.load(f)
+        # with open(os.path.join(comm.temp_dir, str(shared_seed), "rank_{}.pkl".format(comm.get_rank())), 'wb') as f:
+        #     # json.dump(results, f)
+        #     pickle.dump(results, f)
+        # comm.synchronize()
+        # if comm.is_main_process():
+        #     results_all = list()
+        #     for i in range(comm.get_world_size()):
+        #         with open(os.path.join(comm.temp_dir, str(shared_seed), "rank_{}.pkl".format(i)), 'rb') as f:
+        #             # results_all += json.load(f)
+        #             results_all += pickle.load(f)
 
-            results = results_all
+        #     results = results_all
 
             if evaluator is not None:
                 eval_res = evaluator.eval(results, epoch)
             else:
                 eval_res = ''
 
-            # remove cached files
-            shutil.rmtree(os.path.join(comm.temp_dir, str(shared_seed)))
+        #     # remove cached files
+        #     shutil.rmtree(os.path.join(comm.temp_dir, str(shared_seed)))
 
     model.train()
-    comm.synchronize()
+    # comm.synchronize()
     if comm.is_main_process():
         return eval_res
     else:

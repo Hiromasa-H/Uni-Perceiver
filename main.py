@@ -28,7 +28,8 @@ import copy
 
 def add_data_prefix(cfg):
     # TODO: more flexible method
-    data_dir = os.getenv("DATA_PATH", None)
+    # data_dir = os.getenv("DATA_PATH", None)
+    data_dir = '/home/hhiromasa/code/Uni-Perceiver/data' #CHANGED
     mapping_list = [
         [cfg.DATALOADER, 'FEATS_FOLDER', ['DATALOADER',]],
         [cfg.DATALOADER, 'ANNO_FOLDER', ['DATALOADER', ]],
